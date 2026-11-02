@@ -1,0 +1,15 @@
+let U=ld('v_user',{name:'Anika Menon',email:'anika@example.com',phone:'+91 98470 00000'}),tab='Profile';const T=['Profile','Orders','Addresses','Wishlist','Settings'];
+function draw(){const O=ld('v_orders',[{no:'V204518',date:'12/09/2026',total:540,items:2},{no:'V198832',date:'03/06/2026',total:310,items:1}]),A=ld('v_addr',['12 Linen Row, Kochi, Kerala 682001']);
+const V={Profile:`<h2 class="serif text-4xl mb-6">Personal details</h2><form id="pf" class="grid gap-4 max-w-md text-sm">${['name','email','phone'].map(k=>`<label>${k[0].toUpperCase()+k.slice(1)}<input name="${k}" value="${U[k]}" ${k=='email'?'type="email" required':''} class="block w-full border border-[#E5E5E5] p-3 mt-1"></label>`).join('')}<button class="btn">Save changes</button></form>`,
+Orders:`<h2 class="serif text-4xl mb-6">My orders</h2>${O.map(o=>`<div class="flex justify-between border-b border-[#E5E5E5] py-4 text-sm"><span>Order ${o.no}, ${o.date}</span><span>${o.items} item${o.items>1?'s':''}, ${money(o.total)}</span></div>`).join('')}`,
+Addresses:`<h2 class="serif text-4xl mb-6">Saved addresses</h2>${A.map((a,i)=>`<p class="flex justify-between border-b border-[#E5E5E5] py-4 text-sm">${a}<button data-da="${i}" class="underline">Remove</button></p>`).join('')}<form id="af" class="flex gap-2 mt-6"><input id="ai" required placeholder="New address" aria-label="New address" class="flex-1 border border-[#E5E5E5] p-3 text-sm"><button class="btn">Add address</button></form>`,
+Wishlist:`<h2 class="serif text-4xl mb-6">Favourites</h2><p class="text-sm mb-4">${S.wish.length} saved piece${S.wish.length==1?'':'s'}.</p><a class="btn" href="wishlist.html">Open favourites</a>`,
+Settings:`<h2 class="serif text-4xl mb-6">Account settings</h2><label class="flex gap-2 text-sm py-2"><input type="checkbox" id="nw" ${ld('v_nl',true)?'checked':''}>Email me about new arrivals</label><button id="lo" class="btn-o mt-6">Log out</button>`};
+$('#app').innerHTML=`<div class="max-w-[1200px] mx-auto px-5 md:px-10 py-10"><h1 class="serif text-5xl md:text-7xl mb-10">Hello, ${U.name.split(' ')[0]}</h1><div class="md:grid grid-cols-4 gap-12"><nav class="flex md:flex-col gap-4 overflow-x-auto mb-8 text-sm" aria-label="Account">${T.map(t=>`<button data-tab="${t}" class="text-left whitespace-nowrap py-2 ${t==tab?'border-b border-black font-medium':''}">${t}</button>`).join('')}</nav><section class="col-span-3">${V[tab]}</section></div></div>`;
+$$('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;draw()});
+$('#pf')&&($('#pf').onsubmit=e=>{e.preventDefault();U=Object.fromEntries(new FormData(e.target));sv('v_user',U);toast('Profile saved');draw()});
+$('#af')&&($('#af').onsubmit=e=>{e.preventDefault();A.push($('#ai').value);sv('v_addr',A);toast('Address added');draw()});
+$$('[data-da]').forEach(b=>b.onclick=()=>{A.splice(b.dataset.da,1);sv('v_addr',A);draw()});
+$('#nw')&&($('#nw').onchange=e=>{sv('v_nl',e.target.checked);toast('Preference saved')});
+$('#lo')&&($('#lo').onclick=()=>{localStorage.removeItem('v_user');toast('You are logged out');setTimeout(()=>location.href='index.html',900)})}
+draw();
